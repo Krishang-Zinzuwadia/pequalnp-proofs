@@ -83,7 +83,8 @@ theorem PEqualNP.Outside.R_meta_1882_1 :
       have he' : e ∈ E ∧ ∃ p q, e = s(p, q) ∧ G.Adj z p := Finset.mem_filter.mp he
       obtain ⟨heE, p, q, rfl, hzp⟩ := he'
       have hpq : G.Adj p q := G.mem_edgeSet.mp (SimpleGraph.mem_edgeFinset.mp (hE heE))
-      have ⟨hpD, hqD⟩ := hD p q hpq
+      have hpD := (hD p q hpq).1
+      have hqD := (hD p q hpq).2
       by_cases hqz : q = z
       · subst q
         refine Finset.mem_biUnion.mpr ⟨p, hpD, Finset.mem_filter.mpr ⟨heE, Or.inl ?_⟩⟩
@@ -151,8 +152,11 @@ theorem PEqualNP.Outside.R_meta_1882_1 :
       by_cases hem : e ∈ missed
       · exact Finset.mem_union_right _ hem
       · exact Finset.mem_union_left _ (Finset.mem_sdiff.mpr ⟨he, hem⟩)
-    have h := (Finset.card_le_card hu).trans (Finset.card_union_le known missed)
-    omega
+    calc
+      (Ustar G C).card ≤ known.card + missed.card :=
+        (Finset.card_le_card hu).trans (Finset.card_union_le known missed)
+      _ ≤ 4 * (C.size + 1) + (C.size + 1) := Nat.add_le_add hK hm
+      _ = 5 * (C.size + 1) := (Nat.succ_mul 4 (C.size + 1)).symm
   by_cases hsmall : SmallNeighborhoodCover G C
   · exact (small_neighborhood_case G C hg (hSupport n G C hl) hsmall).trans
       (Nat.mul_le_mul_right _ (Nat.le_max_left 5 c))
